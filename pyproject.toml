@@ -35,7 +35,7 @@ omit = [
 show_missing = true
 fail_under = 75
 omit = [
-    "tests/*"
+    "tests/*",
     "*/site-packages/*"
 ]
 exclude_lines = [
