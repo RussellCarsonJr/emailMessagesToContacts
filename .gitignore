@@ -25,3 +25,9 @@ htmlcov/
 
 # pytest cache
 .pytest_cache/
+
+# VS Code settings
+.vscode/
+
+# Misplaced files
+messages_template.py
