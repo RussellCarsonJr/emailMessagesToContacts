@@ -1,29 +1,5 @@
 #! /usr/bin/env python3.10
-# email_service.py - sends text and email messages
-"""
-email_service.py - Sends text and email messages to a mailing list.
-
-This module provides classes and functions for:
-- Sending bulk HTML emails with attachments
-- Managing contacts in a SQLite database
-- Reading email replies from Gmail inbox
-
-Classes:
-    Messages:              Base class for all message types.
-    EmailMessages:         Sends HTML emails using SMTP_SSL.
-    AutomateEmailMessage:  Sends bulk emails to a mailing list.
-    TextMessage:           Sends iMessages to contacts.
-
-Functions:
-    renderTemplate:           Renders a Jinja2 HTML template.
-    contacts_mailinglist:     Returns all contacts as a list.
-    openOrCreateEmailDatabase: Creates or opens SQLite database.
-    add_contacts:             Adds a contact to the database.
-    delete_contacts:          Deletes a contact by name.
-    view_all_contacts:        Displays all contacts.
-    search_contacts:          Searches contacts by term.
-    update_contact:           Updates a contact field.
-"""
+# messages.py - sends text and email messages
 
 import os
 import smtplib
@@ -47,15 +23,6 @@ HEADER_FONT = "FFFFFF"
 
 
 def render_template(template_file: str, **kwargs: Any) -> str:
-    """Load templates from the current directory
-
-    Args:
-        template_file (str): Name of template file to load (must be in the same directory as this script).
-        **kwargs (Any): Keyword arguments to pass to the template for rendering.
-
-    Returns:
-        str: Rendered template as a string.
-    """
     # Load templates from the current directory
     base_dir = os.path.dirname(os.path.abspath(__file__))
     templates_dir = os.path.join(base_dir, "templates")
@@ -65,14 +32,6 @@ def render_template(template_file: str, **kwargs: Any) -> str:
 
 
 def contacts_mailinglist(cursor: sqlite3.Cursor) -> list[dict]:
-    """Creates list of contacts
-
-    Args:
-        cursor (sqlite3.Cursor): Database cursor for executing queries.
-
-    Returns:
-        list[dict]: List of contacts as dictionaries.
-    """
     results = []
 
     cursor.execute("SELECT * FROM contacts")
@@ -96,13 +55,6 @@ def contacts_mailinglist(cursor: sqlite3.Cursor) -> list[dict]:
 
 
 def open_or_create_email_database(db_name: str) -> tuple[sqlite3.Connection, sqlite3.Cursor]:
-    """Creates the database and table
-
-    Args:
-        db_name (str): Name of the SQLite database file to create or open.
-
-    Returns:
-        tuple[sqlite3.Connection, sqlite3.Cursor]: Tuple with conn and cursor for the database"""
     # your database code here
     """CREATE the database and table"""
     # Connect to database (create file if it doesn't exist)
@@ -138,11 +90,6 @@ def open_or_create_email_database(db_name: str) -> tuple[sqlite3.Connection, sql
 
 
 def close_database(conn: sqlite3.Connection):
-    """Closes the database
-
-    Args:
-        conn (sqlite3.Connection): Active SQLite databae connection.
-    """
     conn.close()
     print("Database connection closed.")
 
@@ -150,19 +97,7 @@ def close_database(conn: sqlite3.Connection):
 def add_contacts(
     conn: sqlite3.Connection, cursor: sqlite3.Cursor, name: str, phone: str, email_address: str, date_added: str
 ) -> None:
-    """Add a single contact to the contacts table
-
-    Args:
-        conn (sqlite3.Connection): Active SQLite database connection.
-        cursor (sqlite3.Cursor): Database cursor for executing queries.
-        name (str): Full name of contact.
-        phone (str): Phone number of contact.
-        email_address (str): Email address of contact.
-        date_added (str): Date added in MM/DD/YYYY format.
-
-    Raises
-        sqlite3.IntegrityError:  If contact with same email exists
-    """
+    """Add a contact to the database"""
     try:
         cursor.execute(
             """
@@ -179,27 +114,13 @@ def add_contacts(
 
 
 def add_multiple_contacts(conn: sqlite3.Connection, cursor: sqlite3.Cursor, contacts_list: list) -> None:
-    """Add multiple contacts to the database
-
-    Args:
-        conn (sqlite3.Connection): Active SQLite database connection.
-        cursor (sqlite3.Cursor): Database cursor for executing queries.
-        contacts_list (list): List of tuples containing contact information.
-
-    """
+    """Add multiple contacts to the database"""
     for name, phone, email_address, date_added in contacts_list:
         add_contacts(conn, cursor, name, phone, email_address, date_added)
 
 
 def delete_contacts(conn: sqlite3.Connection, cursor: sqlite3.Cursor, name: str) -> None:
-    """Delete contact by NAME
-
-    Args:
-        conn (sqlite3.Connection): Active SQLite database connection.
-        cursor (sqlite3.Cursor): Database cursor for executing queries.
-        name (str): Full name of contact to delete.
-    """
-
+    """Delete contact by NAME"""
     cursor.execute("SELECT * FROM contacts WHERE name = ?", (name,))
     result = cursor.fetchone()
 
@@ -212,11 +133,7 @@ def delete_contacts(conn: sqlite3.Connection, cursor: sqlite3.Cursor, name: str)
 
 
 def view_all_contacts(cursor: sqlite3.Cursor) -> None:
-    """Display all contacts in the database
-
-    Args:
-        cursor (sqlite3.Cursor): Database cursor for executing queries.
-    """
+    """Display all contacts in the database"""
     cursor.execute("SELECT * FROM contacts")
     contacts = cursor.fetchall()
 
@@ -237,12 +154,7 @@ def view_all_contacts(cursor: sqlite3.Cursor) -> None:
 
 
 def search_contacts(cursor: sqlite3.Cursor, search_term: str) -> None:
-    """Search contacts by name email_address or phone
-
-    Args:
-        cursor (sqlite3.Cursor): Database cursor for executing queries.
-        search_term (str): Term to search for in contact names, phone numbers, or email addresses.
-    """
+    """Search contacts by name email_address or phone"""
     cursor.execute(
         """
         SELECT * FROM contacts
@@ -266,16 +178,7 @@ def search_contacts(cursor: sqlite3.Cursor, search_term: str) -> None:
 def update_contact(
     conn: sqlite3.Connection, cursor: sqlite3.Cursor, contact_id: int, name: str, field: str, new_value: str
 ) -> None:
-    """Update a specific field of a contact
-
-    Args:
-        conn (sqlite3.Connection): Active SQLite database connection.
-        cursor (sqlite3.Cursor): Database Cursor for executing queries.
-        contact_id (int): ID of the contact to update.
-        name (str): Full name of contact.
-        field (str): Desired field to update (name, phone, email_address, date_added).
-        new_value (str): Desired value of field being updated.
-    """
+    """Update a specific field of a contact"""
     valid_fields = ["name", "phone", "email_address", "date_added"]
 
     if field not in valid_fields:
@@ -296,14 +199,6 @@ def update_contact(
 
 
 def open_or_create_email_workbook(filename: str):
-    """opens or creates workbook if workbook does not exist
-
-    Args:
-        filename (str): Name of workbook file to open or create
-
-    Returns:
-        _type_: workbook object
-    """
     # your openpyxl code here
     if os.path.exists(filename):
         wb = openpyxl.load_workbook(filename)
@@ -321,11 +216,6 @@ def open_or_create_email_workbook(filename: str):
 
 # Header writer
 def write_header(sheet):
-    """Creates Header Information in the first row of the workbook
-
-    Args:
-        sheet (_type_): worksheet object
-    """
     sheet.append(HEADER)
     for col, cell in enumerate(sheet[1], start=1):
         cell.font = Font(bold=True, color=HEADER_FONT)
@@ -334,29 +224,13 @@ def write_header(sheet):
 
 class Messages:
     def __init__(self, name: str, phone: str):
-        """Creates a new message instance
-
-        Args:
-            name (str): Full name of contact.
-            phone (str): Phone number of contact.
-        """
         self.name = name
         self.phone = phone
 
     def send(self):
-        """Called by subclasses to send the actual message. Must be implemented in subclass.
-
-        Raises:
-            NotImplementedError: If subclass does not implement send() method
-        """
         raise NotImplementedError("Subclass must implement send()")
 
     def __str__(self) -> str:
-        """Converts message object to string for easy printing
-
-        Returns:
-            str: Message object as string
-        """
         return f"{self.name} | {self.phone}"
 
 
@@ -374,22 +248,9 @@ class EmailMessages(Messages):
         username: str,
         password: str,
     ) -> None:
-        """establishes email server connection
-
-        Args:
-            name (str): Full name of contact.
-            phone (str): Phone number of contact.
-            email (str): Email address of contact.
-            subject (str): Email message subject line.
-            body (str): Body of email message.
-            smtp_server (str): SMTP server address (e. g. smtp.gmail.com).
-            smtp_port (int): SMTP server port (e. g. 465 for SSL, 587 for TLS).
-            username (str): Sender email adderss (must be valid email account on the SMTP server).
-            password (str): Sender email password.
-        """
 
         super().__init__(name, phone)  # inherits name and phone from Message
-        self.email_address = email_address
+        self.email = email_address
         self.subject = subject
         self.body = body
         self.smtp_server = smtp_server
@@ -398,34 +259,21 @@ class EmailMessages(Messages):
         self.password = password
 
     def send(self):
-        """sends the actual email message"""
-        html_body = render_template(
-            "email_messages_template.html",
-            subject="Your Learning Dreams Visit Confirmation",
-            company_name="Learning Dreams",
-            company_address="1710 W. Genesee St, Flint MI 48504",
-            recipient_name=self.name,
-            sender_name="Customer Service",
-            body="Thank you for your visit. Here is your summary:",
-            items=["Test 1 — Evaluation"],  # "Item 2 — Gadget", "Item 3 — Doohickey"],
-            unsubscribe_link="https://RussellCarsonJr.pythonanywhere.com/unsubscribe",
-        )
-
         try:
             # Build the email
             msg = MIMEMultipart("alternative")
             msg["Subject"] = self.subject  # <- self. instead of parameter
             msg["From"] = self.username  # <- self. instead of parameter
-            msg["To"] = self.email_address  # <- self. instead of parameter
+            msg["To"] = self.email  # <- self. instead of parameter
 
             # Attach the HTML body
-            msg.attach(MIMEText(html_body, "html"))
+            msg.attach(MIMEText(self.body, "html"))
 
             # Connect and send
             with smtplib.SMTP_SSL(self.smtp_server, self.smtp_port) as server:
                 server.login(self.username, self.password)
-                server.sendmail(self.username, self.email_address, msg.as_string())
-                print(f"Email sent successfully to {self.email_address}")
+                server.sendmail(self.username, self.email, msg.as_string())
+                print(f"Email sent successfully to {self.email}")
 
         except smtplib.SMTPException as e:
             print(f"Failed to send email: {e}")
@@ -446,20 +294,7 @@ class AutomateEmailMessage(Messages):
         is_html: bool,
         attachments: Optional[list[str]] = None,
     ) -> None:
-        """puts email message and attachments together
 
-        Args:
-            name (str): Full name of contact.
-            phone (str): Phone Number of contact.
-            sender_email (str): Sender's email address (must be valid email account on the SMTP server).
-            sender_name (str): Sender's full name to appear in the "From" field of the email.
-            password (str): Sender's email password.
-            receiver (str): Recipient's email address.
-            email_body (str): Body of email message (can be plain text or HTML).
-            email_subject (str): Email message subject line.
-            is_html (bool): True if email_body is HTML, False if plain text.
-            attachments (Optional[list[str]], optional): List of file paths to attach to the email. Defaults to None.
-        """
         super().__init__(name, phone)  # inherits name and phone from Message
         self.sender_email = sender_email
         self.sender_name = sender_name
@@ -478,7 +313,6 @@ class AutomateEmailMessage(Messages):
         ]
 
     def send(self):
-        """sends the actual email"""
         html_body = render_template(
             "automate_email_message_template4.html",
             subject="Your Learning Dreams Visit Confirmation",
@@ -540,10 +374,10 @@ class AutomateEmailMessage(Messages):
             print(f"Sending email from: {self.sender_email}")
             print("********************************************")
             # for receiver:
-            msg["To"] = self.email_address
-            print(f"Sending email to: {self.email_address}")
+            msg["To"] = self.receiver
+            print(f"Sending email to: {self.receiver}")
             my_server.send_message(msg)
-            print(f"....\nSuccessfully sent to: {self.email_address}")
+            print(f"....\nSuccessfully sent to: {self.receiver}")
             print("********************************************")
             del msg["To"]
         except Exception as e:
@@ -555,18 +389,10 @@ class AutomateEmailMessage(Messages):
 # Text subclass
 class TextMessage(Messages):
     def __init__(self, name: str, phone: str, body: str) -> None:
-        """_summary_
-
-        Args:
-            name (str): Full name of contact.
-            phone (str): Phone number of contact.
-            body (str): Body of text message.
-        """
         super().__init__(name, phone)  # inherits name and phone from Message
         self.body = body
 
     def send(self):
-        """Sends the actual text message."""
         # Your iMessage sending code here
         print(f"Sending text to {self.phone}")
 
@@ -597,7 +423,7 @@ if __name__ == "__main__":
                     "How can we improve?",
                 ],
                 items=[],
-                feedback_link="http://localhost:5000/contacts",
+                feedback_link="http://localhast:5000/contacts",
                 unsubscribe_link="http://localhost:5000/unsubscribe",
             )
 

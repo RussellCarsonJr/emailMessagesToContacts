@@ -2,68 +2,81 @@
 # automateEmailMessageFlask.py - sends bulk html email messages
 
 import sqlite3
+
 from flask import Flask, render_template, request
-from email_service import openOrCreateEmailDatabase, contacts_mailinglist, add_contacts, delete_contacts
+
+from email_service import (
+    delete_contacts,
+    open_or_create_email_database,
+)
 
 app = Flask(__name__)
 
 FILENAME = "/Users/RussellCarsonJr/automate_email_message_contacts.db"
 
+
 @app.route("/contacts")
 def contacts():
-    conn, cursor = openOrCreateEmailDatabase(FILENAME)
-    mailing_list = contacts_mailinglist(cursor)
+    conn, cursor = open_or_create_email_database(FILENAME)
     conn.close()
 
     # for i in range(len(mailing_list)):
-    return render_template("automate_email_message_template.html",
-            subject             = "Customer Service",
-            company_name        = "Learning Dreams",
-            company_address     = "1091 Creekwood Trail, Burton, MI 48509",
-            recipient_name      = "Valued Customer",
-            body                = "We appreciate your continued support.",
-            sender_name         = "Kori",
-            unsubscribe_link    = "https://RussellCarsonJr.pythonanywhere.com/unsubscribe",
-            questions           = [
-                "How satisfied are you with our service?",
-                "Would you recommend us to a friend?",
-                "How can we improve?"
-            ]
-        )
-    
+    return render_template(
+        "automate_email_message_template.html",
+        subject="Customer Service",
+        company_name="Learning Dreams",
+        company_address="1091 Creekwood Trail, Burton, MI 48509",
+        recipient_name="Valued Customer",
+        body="We appreciate your continued support.",
+        sender_name="Kori",
+        unsubscribe_link="https://RussellCarsonJr.pythonanywhere.com/unsubscribe",
+        questions=[
+            "How satisfied are you with our service?",
+            "Would you recommend us to a friend?",
+            "How can we improve?",
+        ],
+    )
+
+
 @app.route("/submit_answers", methods=["POST"])
 def submit_answers():
 
-    name    = request.form.get("recipient_name")
+    name = request.form.get("recipient_name")
     answer1 = request.form.get("answer_1")
     answer2 = request.form.get("answer_2")
     answer3 = request.form.get("answer_3")
     try:
         # Save to database
-        conn, cursor = openOrCreateEmailDatabase(FILENAME)
-        cursor.execute('''
+        conn, cursor = open_or_create_email_database(FILENAME)
+        cursor.execute(
+            """
             INSERT INTO contact_answers (name, answer_1, answer_2, answer_3)
             VALUES (?, ?, ?, ?)
-        ''', (name, answer1, answer2, answer3))
+        """,
+            (name, answer1, answer2, answer3),
+        )
         conn.commit()
         conn.close()
     except sqlite3.OperationalError as e:
         print(f"Database error: {e}")
-        return render_template("error_template.html",
-            message = "We're experiencing high traffic. Please try again."
-        ), 503    # <- 503 = service temporarily unavailable
-    
-    return render_template("submit_answers_template.html",
-        company_name        = "Learning Dreams",
-        company_address     = "1091 Creekwood Trail, Burton, MI 48509",
-        recipient_name      = name,
-        body                = "Thank you for your feedback!",
-        sender_name         = "Kori",
-        answer_1            = answer1,
-        answer_2            = answer2,
-        answer_3            = answer3,
-        unsubscribe_link    = "https://RussellCarsonJr.pythonanywhere.com/unsubscribe" 
+        return (
+            render_template("error_template.html", message="We're experiencing high traffic. Please try again."),
+            503,
+        )  # <- 503 = service temporarily unavailable
+
+    return render_template(
+        "submit_answers_template.html",
+        company_name="Learning Dreams",
+        company_address="1091 Creekwood Trail, Burton, MI 48509",
+        recipient_name=name,
+        body="Thank you for your feedback!",
+        sender_name="Kori",
+        answer_1=answer1,
+        answer_2=answer2,
+        answer_3=answer3,
+        unsubscribe_link="https://RussellCarsonJr.pythonanywhere.com/unsubscribe",
     )
+
 
 @app.route("/unsubscribe", methods=["GET", "POST"])
 def unsubscribe():
@@ -73,22 +86,23 @@ def unsubscribe():
     if request.method == "POST":
         name = request.form.get("recipient_name")
         print(f"Attempting to delete: {name}")
-        conn, cursor = openOrCreateEmailDatabase(FILENAME)
+        conn, cursor = open_or_create_email_database(FILENAME)
         delete_contacts(conn, cursor, name)
         conn.close()
         body = f"Your name: {name} has been deleted from Learning Dreams' contact list."
 
-    return render_template("unsubscribe_email_message_template.html",
-        subject         = "Unsubscribe",
-        company_name    = "Learning Dreams",
-        company_address = "1091 Creekwood Trail, Burton, MI 48509",
-        recipient_name  = name,
-        body            = body,
-        sender_name     = "Kori",
-        unsubscribe_link= "https://RussellCarsonJr.pythonanywhere.com/unsubscribe",
-        unsubscribe_page= True
+    return render_template(
+        "unsubscribe_email_message_template.html",
+        subject="Unsubscribe",
+        company_name="Learning Dreams",
+        company_address="1091 Creekwood Trail, Burton, MI 48509",
+        recipient_name=name,
+        body=body,
+        sender_name="Kori",
+        unsubscribe_link="https://RussellCarsonJr.pythonanywhere.com/unsubscribe",
+        unsubscribe_page=True,
     )
+
 
 if __name__ == "__main__":
     app.run(debug=True)
-    

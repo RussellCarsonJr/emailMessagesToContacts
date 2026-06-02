@@ -2,12 +2,12 @@ import pytest
 import os
 from app import app
 import sqlite3
-from email_service import openOrCreateEmailDatabase, delete_contacts
 
 # -- Fixture - creates Flask test client --
 @pytest.fixture
 def client():
-    app.template_folder = os.path.join(os.path.dirname(os.path.dirname(__file__)), "templates")
+    app.template_folder = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+        "templates")
     app.config["TESTING"] = True
     app.config["WTF_CSRF_ENABLED"] = False
     with app.test_client() as client:
@@ -85,7 +85,7 @@ def test_submit_answers_database_error(client, monkeypatch):
         raise sqlite3.OperationalError("Database is locked")
 
     monkeypatch.setattr(
-        "app.openOrCreateEmailDatabase",
+        "app.open_or_create_email_database",
         mock_db_error
     )
 

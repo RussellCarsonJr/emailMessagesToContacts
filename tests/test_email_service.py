@@ -1,29 +1,27 @@
+
 import pytest
-import sqlite3
+
 from email_service import (
-    openOrCreateEmailDatabase,
-    add_contacts,
-    delete_contacts,
-    search_contacts,
-    view_all_contacts,
-    contacts_mailinglist,
-    update_contact
-)
-from email_service import add_multiple_contacts
-from email_service import (
-    renderTemplate,
-    openOrCreateEmailWorkbook,
-    writeHeader,
-    Messages,
     EmailMessages,
-    TextMessages
+    Messages,
+    TextMessage,
+    add_contacts,
+    contacts_mailinglist,
+    delete_contacts,
+    open_or_create_email_database,
+    open_or_create_email_workbook,
+    render_template,
+    search_contacts,
+    update_contact,
+    view_all_contacts,
 )
+
 
 # -- Fixture - create fresh in-memory database for each test --
 @pytest.fixture
 def db():
     """Create a fresh in-memory database for each test"""
-    conn, cursor = openOrCreateEmailDatabase(":memory:")
+    conn, cursor = open_or_create_email_database(":memory:")
     yield conn, cursor       # <- provides conn and cursor to each test
     conn.close()
 
@@ -136,23 +134,14 @@ def test_update_contact_invalid_field(db_with_contacts, capsys):
     captured = capsys.readouterr()
     assert "Invalid field" in captured.out
     
-def test_add_multiple_contacts(db):
-    conn, cursor = db
-    contacts_list = [
-        ("Russell A. Carson, Jr.", "+12488905236", "RussellCarsonJr@icloud.com", "05/21/2026"),
-        ("Russell A. Carson, Sr.", "+19106101705", "rac1acus@gmail.com", "05/21/2026")
-    ]
-    add_multiple_contacts(conn, cursor, contacts_list)
-    cursor.execute("SELECT COUNT(*) FROM contacts")
-    count = cursor.fetchone()[0]
-    assert count == 2
-    
 # -- Test IntegrityError path in add_contacts --
 def test_add_duplicate_contact(db, capsys):
     conn, cursor = db
     # Add contact twice
-    add_contacts(conn, cursor, "Russell Jr.", "+12488905236", "jr@gmail.com", "05/21/2026")
-    add_contacts(conn, cursor, "Russell Jr.", "+12488905236", "jr@gmail.com", "05/21/2026")
+    add_contacts(conn, cursor, "Russell Jr.", "+12488905236", "jr@gmail.com",
+        "05/21/2026")
+    add_contacts(conn, cursor, "Russell Jr.", "+12488905236", "jr@gmail.com",
+        "05/21/2026")
     captured = capsys.readouterr()
     assert "already exists" in captured.out    # <- IntegrityError path
 
@@ -169,18 +158,9 @@ def test_search_contacts_empty(db, capsys):
     captured = capsys.readouterr()
     assert "No contacts found" in captured.out
 
-# -- Test update_contact invalid field --
-def test_update_contact_invalid_field(db_with_contacts, capsys):
-    conn, cursor = db_with_contacts
-    cursor.execute("SELECT id FROM contacts WHERE name = ?", ("Russell A. Carson, Jr.",))
-    contact_id = cursor.fetchone()[0]
-    update_contact(conn, cursor, contact_id, "Russell A. Carson, Jr.", "invalid_field", "value")
-    captured = capsys.readouterr()
-    assert "Invalid field" in captured.out
-
 # -- Test for renderTemplate --
 def test_render_template():
-    html = renderTemplate("automate_email_message_template.html",
+    html = render_template("automate_email_message_template.html",
         subject            = "Test",
         company_name       = "Learning Dreams",
         company_address    = "1091 Creekwood Trail",
@@ -195,20 +175,20 @@ def test_render_template():
     assert "Russell" in html
 
 # -- Tests for openOrCreateEmailWorkbook --
-def test_open_or_create_email_workbook(tmp_path_):
-    filename = str(tmp_path_ / "test_contacts.xlsx")
-    wb = openOrCreateEmailWorkbook(filename)
+def test_open_or_create_email_workbook(tmp_path):
+    filename = str(tmp_path / "test_contacts.xlsx")
+    wb = open_or_create_email_workbook(filename)
     assert wb is not None
    
 def test_open_existing_email_workbook(tmp_path):
     filename = str(tmp_path / "test_contacts.xlsx")
-    wb = openOrCreateEmailWorkbook(filename)
-    wb = openOrCreateEmailWorkbook(filename)
+    wb = open_or_create_email_workbook(filename)
+    wb = open_or_create_email_workbook(filename)
     assert wb is not None
 
 # -- Tests for Messages base class --
 def test_messages_str():
-    msg = Message.__new__(Messages)
+    msg = Messages.__new__(Messages)
     msg.name = "Russell"
     msg.phone = "+12488905236"
     assert str(msg) == "Russell | +12488905236"
@@ -220,7 +200,7 @@ def test_messages_send_not_implemented():
 
 # -- Tests for TextMessage --
 def test_text_message_init():
-    text = TextMessages(
+    text = TextMessage(
         name = "Russell",
         phone = "+12488905236",
         body = "Hello"
@@ -230,7 +210,7 @@ def test_text_message_init():
     assert text.body == "Hello"
 
 def test_text_message_send(capsys):
-    text = TextMessages(
+    text = TextMessage(
         name = "Russell",
         phone = "+12488905236",
         body = "Hello"
@@ -244,16 +224,16 @@ def test_email_message_init():
     email = EmailMessages(
         name            = "Russell",
         phone           = "+12488905236",
-        email           = "russell@gmail.com",
+        email_address   = "russell@gmail.com",
         subject         = "Test",
         body            = "Test body",
         smtp_server     = "smtp.gmail.com",
         smtp_port       = 465,
-        username       = "sender@gmail.com",
-        password       = "password"
+        username        = "sender@gmail.com",
+        password        = "password"
     )
     assert email.name == "Russell"
-    assert email.email == "russell@gmail.com"
+    assert email.email_address == "russell@gmail.com"
     assert email.smtp_server == "smtp.gmail.com"
 
     

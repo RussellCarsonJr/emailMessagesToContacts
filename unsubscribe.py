@@ -1,30 +1,14 @@
 #! /usr/bin/env python3.10
 # unsubscribeLink.py - deletes searched contact
 
-import openpyxl
-from openpyxl import Workbook
-import os
-
-# -- Constants --------------------------------------------------
-FILENAME                = "/home/RussellCarsonJr/messageContacts.xlsx"
+from email_service import delete_contacts, open_or_create_email_database
 
 
+def unsubscribe_contact(name):
+    conn, cursor = open_or_create_email_database
+    name = input("Enter your full name to unsubscribe: ")
+    delete_contacts(conn, cursor, name)
 
-from openOrCreateMessageWorkbook import(
-    openOrCreateWorkbook,
-    searchContact,
-    deleteContacts
-)
-
-def unsubscribeContact(filename, name):
-    wb = openOrCreateWorkbook(filename)
-    searchContact(wb, name)
-    deleteContacts(wb, filename, name)
-    wb.save(filename)
 
 if __name__ == "__main__":
-    FILENAME = "messageContacts.xlsx"
-    name = input("Enter name to search for: ")
-    unsubscribeContact(FILENAME, name)
-
-
+    pass
