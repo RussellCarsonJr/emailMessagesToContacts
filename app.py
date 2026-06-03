@@ -74,7 +74,7 @@ def submit_answers():
         company_address="Your Company Address",
         recipient_name=name,
         body="Thank you for your feedback!",
-        sender_name="Kori",
+        sender_name="Your Name",
         answer_1=answer1,
         answer_2=answer2,
         answer_3=answer3,
@@ -93,7 +93,7 @@ def unsubscribe():
         conn, cursor = open_or_create_email_database(FILENAME)
         delete_contacts(conn, cursor, name)
         conn.close()
-        body = f"Your name: {name} has been deleted from Learning Dreams' contact list."
+        body = f"Your name: {name} has been deleted from 'Your Business' Name' contact list."
 
     return render_template(
         "unsubscribe_email_message_template.html",
