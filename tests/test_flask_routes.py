@@ -1,20 +1,32 @@
 import os
 import sqlite3
-
 import pytest
-
+import tempfile
+import app as flask_app
 from app import app
 
 
 # -- Fixture - creates Flask test client --
 @pytest.fixture
 def client():
-    app.template_folder = os.path.join(os.path.dirname(os.path.dirname(__file__)), "templates")
+    # Create temporary database file
+    db_fd, db_path = tempfile.mkstemp(suffix=".db")
+    
+    app.template_folder = os.path.join(
+        os.path.dirname(os.path.dirname(__file__)), "templates"
+    )
     app.config["TESTING"] = True
     app.config["WTF_CSRF_ENABLED"] = False
+
+    # Override FILENAME with temp database:
+    flask_app.FILENAME = db_path
+    
     with app.test_client() as client:
         yield client
 
+    # Cleanup temp database after tests:
+    os.close(db_fd)
+    os.unlink(db_path)
 
 # -- Tests for /contacts route --
 def test_contacts_page_loads(client):
@@ -24,7 +36,7 @@ def test_contacts_page_loads(client):
 
 def test_contacts_page_contains_company_name(client):
     response = client.get("/contacts")
-    assert b"Learning Dreams" in response.data
+    assert b"Your Company Name" in response.data
 
 
 def test_contacts_page_contains_questions(client):
