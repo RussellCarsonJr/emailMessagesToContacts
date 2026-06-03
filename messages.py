@@ -1,20 +1,22 @@
 #! /usr/bin/env python3.10
 # messages.py - sends text and email messages
 
-import os
 import smtplib
-import sqlite3
 import ssl
+import os
+import sqlite3
+import openpyxl
+from openpyxl.styles import Font, PatternFill
 from email.message import EmailMessage
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 from email.utils import formataddr
 from mimetypes import guess_type
-from typing import Any, Optional
-
-import openpyxl
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from jinja2 import Environment, FileSystemLoader
-from openpyxl.styles import Font, PatternFill
+from typing import Optional, Any
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # -- Constants ------------------------------------------
 HEADER = ["Name", "Phone", "Email Address"]
@@ -398,11 +400,11 @@ class TextMessage(Messages):
 
 
 if __name__ == "__main__":
-    attachments = ["/Users/russellcarsonjr/Automate_Boring_Stuff_Python/rose-9917575_640.jpg"]
-    FILENAME = "/Users/russellcarsonjr/automate_email_message_contacts.db"
+    attachments = [os, environ.get("ATTACHMENT_PATH") or ""]
+    FILENAME = os.environ.get("DB_FILENAME") or "contacts.db"
     conn, cursor = open_or_create_email_database(FILENAME)
-    add_contacts(conn, cursor, "Russell A. Carson, Jr.", "+12488905236", "RussellCarsonJr@icloud.com", "05/21/2026")
-    add_contacts(conn, cursor, "Russell A. Carson, Sr.", "+18106101705", "rac1acus@gmail.com", "05/21/2026")
+    add_contacts(conn, cursor, "Your Name", "+1234567890", "your@email.com", "MM/DD/YYYY")
+    add_contacts(conn, cursor, "Your Name", "+1234567890", "your@email.com", "MM/DD/YYYY")
     mailing_list = contacts_mailinglist(cursor)
 
     if not mailing_list:
@@ -411,11 +413,11 @@ if __name__ == "__main__":
         for i in range(len(mailing_list)):
             html_body = render_template(
                 "automate_email_message_template4.html",
-                subject="Customer Feedback",
-                company_name="Learning Dreams",
-                company_address="1091 Creekwood Trail, Burton, MI 48509",
+                subject="Your Subject",
+                company_name="Your Company Name",
+                company_address="Your Company Address",
                 recipient_name=mailing_list[i]["name"],
-                sender_name="Kori",
+                sender_name="Your Name",
                 body="We appreciate your continued support. Please click the link below to submit your feedback: https://RussellCarsonJr.pythonanywhere.com/contacts",
                 questions=[
                     "How satisfied are you with our service?",
@@ -423,19 +425,19 @@ if __name__ == "__main__":
                     "How can we improve?",
                 ],
                 items=[],
-                feedback_link="http://localhast:5000/contacts",
+                feedback_link="http://localhost:5000/contacts",
                 unsubscribe_link="http://localhost:5000/unsubscribe",
             )
 
             message = AutomateEmailMessage(
                 name=mailing_list[i]["name"],
                 phone=mailing_list[i]["phone"],
-                sender_email="RussellCarsonJr@gmail.com",
-                sender_name="Kori E. Carson-Dean",
+                sender_email=os.environ.get("SENDER_EMAIL") or "",
+                sender_name="Your Name",
                 password=os.environ.get("EMAIL_PASSWORD") or "",
                 receiver=mailing_list[i]["email_address"],
                 email_body=html_body,
-                email_subject="Customer Feedback",
+                email_subject="Your Subject",
                 is_html=True,
                 attachments=attachments,
             )

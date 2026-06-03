@@ -8,6 +8,7 @@ flask-login = "*"
 flask = "*"
 openpyxl = "*"
 jinja2 = "*"
+python-dotenv = "*"
   
 [dev-packages]
 pytest = "*"
@@ -17,6 +18,7 @@ ruff = "*"
 mypy = "*"
 djlint = "*"
 pdoc = "*"
+python-dotenv = "*"
 
 [requires]
 python_version = "3.10"
