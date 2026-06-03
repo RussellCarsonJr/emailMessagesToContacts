@@ -1,7 +1,9 @@
-import pytest
 import os
-from app import app
 import sqlite3
+
+import pytest
+
+from app import app
 
 
 # -- Fixture - creates Flask test client --

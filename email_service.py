@@ -37,9 +37,9 @@ from mimetypes import guess_type
 from typing import Any, Optional
 
 import openpyxl
+from dotenv import load_dotenv
 from jinja2 import Environment, FileSystemLoader
 from openpyxl.styles import Font, PatternFill
-from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -575,7 +575,7 @@ class TextMessage(Messages):
 
 
 if __name__ == "__main__":
-    attachments = [os, environ.get("ATTACHMENT_PATH") or ""]
+    attachments = [os.environ.get("ATTACHMENT_PATH") or ""]
     FILENAME = os.environ.get("DB_FILENAME") or "contacts.db"
     conn, cursor = open_or_create_email_database(FILENAME)
     add_contacts(conn, cursor, "Your Name", "+1234567890", "your@email.com", "MM/DD/YYYY")

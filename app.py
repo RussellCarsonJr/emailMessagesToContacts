@@ -1,8 +1,10 @@
 #! /usr/bin/env python3.10
 # automateEmailMessageFlask.py - sends bulk html email messages
 
+import os
 import sqlite3
 
+from dotenv import load_dotenv
 from flask import Flask, render_template, request
 
 from email_service import (
@@ -10,9 +12,11 @@ from email_service import (
     open_or_create_email_database,
 )
 
+load_dotenv()
+
 app = Flask(__name__)
 
-FILENAME = "/Users/RussellCarsonJr/automate_email_message_contacts.db"
+FILENAME = os.environ.get("DB_FILENAME") or "automate_email_message_contacts.db"
 
 
 @app.route("/contacts")
@@ -23,12 +27,12 @@ def contacts():
     # for i in range(len(mailing_list)):
     return render_template(
         "automate_email_message_template.html",
-        subject="Customer Service",
-        company_name="Learning Dreams",
-        company_address="1091 Creekwood Trail, Burton, MI 48509",
+        subject="Your Subject",
+        company_name="Your Company Name",
+        company_address="Your Company Address",
         recipient_name="Valued Customer",
         body="We appreciate your continued support.",
-        sender_name="Kori",
+        sender_name="You Name",
         unsubscribe_link="https://RussellCarsonJr.pythonanywhere.com/unsubscribe",
         questions=[
             "How satisfied are you with our service?",
@@ -66,8 +70,8 @@ def submit_answers():
 
     return render_template(
         "submit_answers_template.html",
-        company_name="Learning Dreams",
-        company_address="1091 Creekwood Trail, Burton, MI 48509",
+        company_name="Your Company Name",
+        company_address="Your Company Address",
         recipient_name=name,
         body="Thank you for your feedback!",
         sender_name="Kori",
@@ -94,11 +98,11 @@ def unsubscribe():
     return render_template(
         "unsubscribe_email_message_template.html",
         subject="Unsubscribe",
-        company_name="Learning Dreams",
-        company_address="1091 Creekwood Trail, Burton, MI 48509",
+        company_name="Your Company Name",
+        company_address="Your Company Address",
         recipient_name=name,
         body=body,
-        sender_name="Kori",
+        sender_name="Your Name",
         unsubscribe_link="https://RussellCarsonJr.pythonanywhere.com/unsubscribe",
         unsubscribe_page=True,
     )

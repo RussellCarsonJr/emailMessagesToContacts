@@ -1,20 +1,21 @@
 #! /usr/bin/env python3.10
 # messages.py - sends text and email messages
 
-import smtplib
-import ssl
 import os
+import smtplib
 import sqlite3
-import openpyxl
-from openpyxl.styles import Font, PatternFill
+import ssl
 from email.message import EmailMessage
-from email.utils import formataddr
-from mimetypes import guess_type
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from jinja2 import Environment, FileSystemLoader
-from typing import Optional, Any
+from email.utils import formataddr
+from mimetypes import guess_type
+from typing import Any, Optional
+
+import openpyxl
 from dotenv import load_dotenv
+from jinja2 import Environment, FileSystemLoader
+from openpyxl.styles import Font, PatternFill
 
 load_dotenv()
 
@@ -400,7 +401,7 @@ class TextMessage(Messages):
 
 
 if __name__ == "__main__":
-    attachments = [os, environ.get("ATTACHMENT_PATH") or ""]
+    attachments = [os.environ.get("ATTACHMENT_PATH") or ""]
     FILENAME = os.environ.get("DB_FILENAME") or "contacts.db"
     conn, cursor = open_or_create_email_database(FILENAME)
     add_contacts(conn, cursor, "Your Name", "+1234567890", "your@email.com", "MM/DD/YYYY")
