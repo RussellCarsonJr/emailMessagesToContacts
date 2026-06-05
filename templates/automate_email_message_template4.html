@@ -40,11 +40,6 @@
         </div>
         <p>Dear {{ recipient_name }},</p>
         <p>{{ body }}</p>
-        <p>Please click below to share your feedback:</p>
-        <a href="https://RussellCarsonJr.pythonanywhere.com/contacts">
-            <button>Submit Feedback</button>
-        </a>
-
         {% if items %}
         <ul>
             {% for item in items %}
@@ -53,9 +48,33 @@
         </ul>
         {% endif %}
         <h3>We would love your feedback:</h3>
-  
+        <form action="/submit_answers" method="POST">
+            <input type="text" name="recipient_name" placeholder="Full name"
+                style="width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px;">
+
+            <ol>
+                {% for question in questions %}
+                <li>
+                    <p>{{ question }}</p>
+                    <textarea name="answer_{{ loop.index }}" rows="3" cols="50"
+                        placeholder="Your answer here..."></textarea>
+                </li>
+                {% endfor %}
+            </ol>
+            <button type="submit">Submit Answers</button>
+        </form>
+        {% for contact in contacts %}
+            <p>{{ contact.name }} | {{ contact.phone }}</p>
+        {% endfor %}
+        
         <p>Best regards,<br>{{ sender_name }}</p>
-       
+        {% if unsubscribe_page %}
+        <form action="/unsubscribe" method="POST">
+            <p>Enter your full name to unsubscribe:</p>
+            <input type="text" name="recipient_name" placeholder="Full name">
+            <button type="submit">Unsubscribe</button>
+        </form>
+        {% endif %} 
         <div class="footer">
             <p>{{ company_name }} | {{ company_address }}</p>
             <p>To unsubscribe, <a href="{{ unsubscribe_link }}">click here</a></p>

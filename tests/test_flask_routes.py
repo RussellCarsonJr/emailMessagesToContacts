@@ -50,7 +50,7 @@ def test_submit_answers(client):
     response = client.post(
         "/submit_answers",
         data={
-            "recipient_name": "Russell A. Carson, Jr.",
+            "recipient_name": "Johm Doe",
             "answer_1": "Very satisfied",
             "answer_2": "Yes",
             "answer_3": "More classes",
@@ -63,7 +63,7 @@ def test_submit_answers_shows_confirmation(client):
     response = client.post(
         "/submit_answers",
         data={
-            "recipient_name": "Russell A. Carson, Jr.",
+            "recipient_name": "John Doe",
             "answer_1": "Very Satisfied",
             "answer_2": "Yes",
             "answer_3": "More classes",
@@ -84,7 +84,7 @@ def test_unsubscribe_page_contains_form(client):
 
 
 def test_unsubscribe_post(client):
-    response = client.post("/unsubscribe", data={"recipient_name": "Russell A. Carson, Jr."})
+    response = client.post("/unsubscribe", data={"recipient_name": "John Doe"})
     assert response.status_code == 200
 
 
@@ -114,6 +114,6 @@ def test_submit_answers_database_error(client, monkeypatch):
 
     response = client.post(
         "/submit_answers",
-        data={"recipient_name": "Russell Jr.", "answer_1": "Great", "answer_2": "Yes", "answer_3": "Nothing"},
+        data={"recipient_name": "John D", "answer_1": "Great", "answer_2": "Yes", "answer_3": "Nothing"},
     )
     assert response.status_code == 503  # <- service unavailable

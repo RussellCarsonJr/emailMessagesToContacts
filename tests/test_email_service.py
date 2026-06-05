@@ -29,8 +29,8 @@ def db():
 @pytest.fixture
 def db_with_contacts(db):
     conn, cursor = db
-    add_contacts(conn, cursor, "Russell A. Carson, Jr.", "+12488905236", "RussellCarsonJr@icloud.com", "05/21/2026")
-    add_contacts(conn, cursor, "Russell A. Carson, Sr.", "+18106101705", "rac1acus@gmail.com", "05/21/2026")
+    add_contacts(conn, cursor, "John Doe", "+11234567890", "john.doe@example.com", "05/21/2026")
+    add_contacts(conn, cursor, "Jane Doe", "+10987654321", "jane.doe@example.com", "05/21/2026")
     return conn, cursor
 
 
@@ -52,12 +52,12 @@ def test_database_creates_contact_answers_table(db):
 # -- Tests for add_contacts --
 def test_add_contacts(db):
     conn, cursor = db
-    add_contacts(conn, cursor, "Russell A. Carson, Jr.", "+12488905236", "RussellCarsonJr@icloud.com", "05/21/2026")
+    add_contacts(conn, cursor, "John Doe", "+11234567890", "john.doe@example.com", "05/21/2026")
     cursor.execute("SELECT * FROM contacts")
     result = cursor.fetchone()
-    assert result[1] == "Russell A. Carson, Jr."
-    assert result[2] == "+12488905236"
-    assert result[3] == "RussellCarsonJr@icloud.com"
+    assert result[1] == "John Doe"
+    assert result[2] == "+11234567890"
+    assert result[3] == "john.doe@example.com"
 
 
 def test_add_multiple_contacts(db_with_contacts):
@@ -70,8 +70,8 @@ def test_add_multiple_contacts(db_with_contacts):
 # -- Tests for delete_contacts --
 def test_delete_contacts(db_with_contacts):
     conn, cursor = db_with_contacts
-    delete_contacts(conn, cursor, "Russell A. Carson, Jr.")
-    cursor.execute("SELECT * FROM contacts WHERE name = ?", ("Russell A. Carson, Jr.",))
+    delete_contacts(conn, cursor, "John Doe")
+    cursor.execute("SELECT * FROM contacts WHERE name = ?", ("John Doe",))
 
 
 def test_delete_nonexistent_contact(db, capsys):
@@ -83,18 +83,18 @@ def test_delete_nonexistent_contact(db, capsys):
 
 def test_delete_only_correct_contact(db_with_contacts):
     conn, cursor = db_with_contacts
-    delete_contacts(conn, cursor, "Russell A. Carson, Jr.")
-    cursor.execute("SELECT * FROM contacts WHERE name = ?", ("Russell A. Carson, Sr.",))
+    delete_contacts(conn, cursor, "John Doe")
+    cursor.execute("SELECT * FROM contacts WHERE name = ?", ("Jane Doe",))
     result = cursor.fetchone()
-    assert result is not None  # Sr. should still be there
+    assert result is not None  # Jane should still be there
 
 
 # -- Tests for search_contacts --
 def test_search_contacts_by_name(db_with_contacts, capsys):
     conn, cursor = db_with_contacts
-    search_contacts(cursor, "Russell")
+    search_contacts(cursor, "John")
     captured = capsys.readouterr()
-    assert "Russell" in captured.out
+    assert "John" in captured.out
 
 
 def test_search_contacts_not_found(db, capsys):
@@ -109,8 +109,8 @@ def test_contacts_mailinglist(db_with_contacts):
     conn, cursor = db_with_contacts
     mailing_list = contacts_mailinglist(cursor)
     assert len(mailing_list) == 2
-    assert mailing_list[0]["name"] == "Russell A. Carson, Jr."
-    assert mailing_list[1]["name"] == "Russell A. Carson, Sr."
+    assert mailing_list[0]["name"] == "John Doe"
+    assert mailing_list[1]["name"] == "Jane Doe"
 
 
 def test_contacts_mailinglist_empty(db):
@@ -132,9 +132,9 @@ def test_contacts_mailinglist_keys(db_with_contacts):
 # -- Tests for update_contact --
 def test_update_contact(db_with_contacts):
     conn, cursor = db_with_contacts
-    cursor.execute("SELECT id FROM contacts WHERE name = ?", ("Russell A. Carson, Jr.",))
+    cursor.execute("SELECT id FROM contacts WHERE name = ?", ("John Doe",))
     contact_id = cursor.fetchone()[0]
-    update_contact(conn, cursor, contact_id, "Russell A. Carson, Jr.", "phone", "+19999999999")
+    update_contact(conn, cursor, contact_id, "John Doe", "phone", "+19999999999")
     cursor.execute("SELECT phone FROM contacts WHERE id = ?", (contact_id,))
     result = cursor.fetchone()
     assert result[0] == "+19999999999"
@@ -142,9 +142,9 @@ def test_update_contact(db_with_contacts):
 
 def test_update_contact_invalid_field(db_with_contacts, capsys):
     conn, cursor = db_with_contacts
-    cursor.execute("SELECT id FROM contacts WHERE name = ?", ("Russell A. Carson, Jr.",))
+    cursor.execute("SELECT id FROM contacts WHERE name = ?", ("John Doe",))
     contact_id = cursor.fetchone()[0]
-    update_contact(conn, cursor, contact_id, "Russell A. Carson, Jr.", "invalid_field", "value")
+    update_contact(conn, cursor, contact_id, "John Doe", "invalid_field", "value")
     captured = capsys.readouterr()
     assert "Invalid field" in captured.out
 
@@ -153,8 +153,8 @@ def test_update_contact_invalid_field(db_with_contacts, capsys):
 def test_add_duplicate_contact(db, capsys):
     conn, cursor = db
     # Add contact twice
-    add_contacts(conn, cursor, "Russell Jr.", "+12488905236", "jr@gmail.com", "05/21/2026")
-    add_contacts(conn, cursor, "Russell Jr.", "+12488905236", "jr@gmail.com", "05/21/2026")
+    add_contacts(conn, cursor, "John D", "+12468024680", "john.d@example.com", "05/21/2026")
+    add_contacts(conn, cursor, "John D", "+12468024680", "john.d@example.com", "05/21/2026")
     captured = capsys.readouterr()
     assert "already exists" in captured.out  # <- IntegrityError path
 
@@ -169,7 +169,7 @@ def test_view_all_contacts_empty(db, capsys):
 
 def test_search_contacts_empty(db, capsys):
     con, cursor = db
-    search_contacts(cursor, "Russell")
+    search_contacts(cursor, "John")
     captured = capsys.readouterr()
     assert "No contacts found" in captured.out
 
@@ -179,17 +179,17 @@ def test_render_template():
     html = render_template(
         "automate_email_message_template.html",
         subject="Test",
-        company_name="Learning Dreams",
-        company_address="1091 Creekwood Trail",
-        recipient_name="Russell",
+        company_name="Your Company Name",
+        company_address="Your Company Address",
+        recipient_name="John",
         body="Test body",
-        sender_name="Kori",
+        sender_name="Your Name",
         unsubscribe_link="http://localhost:5000/unsubscribe",
         questions=[],
         items=[],
     )
-    assert "Learning Dreams" in html
-    assert "Russell" in html
+    assert "Your Company Name" in html
+    assert "John" in html
 
 
 # -- Tests for openOrCreateEmailWorkbook --
@@ -209,9 +209,9 @@ def test_open_existing_email_workbook(tmp_path):
 # -- Tests for Messages base class --
 def test_messages_str():
     msg = Messages.__new__(Messages)
-    msg.name = "Russell"
-    msg.phone = "+12488905236"
-    assert str(msg) == "Russell | +12488905236"
+    msg.name = "John"
+    msg.phone = "+11234567890"
+    assert str(msg) == "John | +11234567890"
 
 
 def test_messages_send_not_implemented():
@@ -222,25 +222,25 @@ def test_messages_send_not_implemented():
 
 # -- Tests for TextMessage --
 def test_text_message_init():
-    text = TextMessage(name="Russell", phone="+12488905236", body="Hello")
-    assert text.name == "Russell"
-    assert text.phone == "+12488905236"
+    text = TextMessage(name="John", phone="+11234567890", body="Hello")
+    assert text.name == "John"
+    assert text.phone == "+11234567890"
     assert text.body == "Hello"
 
 
 def test_text_message_send(capsys):
-    text = TextMessage(name="Russell", phone="+12488905236", body="Hello")
+    text = TextMessage(name="John", phone="+11234567890", body="Hello")
     text.send()
     captured = capsys.readouterr()
-    assert "+12488905236" in captured.out
+    assert "+11234567890" in captured.out
 
 
 # -- Tests for EmailMessages --
 def test_email_message_init():
     email = EmailMessages(
-        name="Russell",
-        phone="+12488905236",
-        email_address="russell@gmail.com",
+        name="John",
+        phone="+11234567890",
+        email_address="john.d@example.com",
         subject="Test",
         body="Test body",
         smtp_server="smtp.gmail.com",
@@ -248,6 +248,6 @@ def test_email_message_init():
         username="sender@gmail.com",
         password="password",
     )
-    assert email.name == "Russell"
-    assert email.email_address == "russell@gmail.com"
+    assert email.name == "John"
+    assert email.email_address == "john.d@example.com"
     assert email.smtp_server == "smtp.gmail.com"

@@ -50,7 +50,9 @@
         <h3>We would love your feedback:</h3>
         <form action="/submit_answers" method="POST">
             <p>Please enter your name:</p>
-            <input type="text" name="recipient_name" placeholder="Full name">
+            <input type="text" name="recipient_name" placeholder="Full name"
+                style="width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px;">
+                    
             <ol>
                 {% for question in questions %}
                 <li>
