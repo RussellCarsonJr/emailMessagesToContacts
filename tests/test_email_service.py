@@ -159,7 +159,7 @@ def test_add_duplicate_contact(db, capsys):
     assert "already exists" in captured.out  # <- IntegrityError path
 
 
-# -- Test empty  daqtabase paths --
+# -- Test empty database paths --
 def test_view_all_contacts_empty(db, capsys):
     conn, cursor = db
     view_all_contacts(cursor)
