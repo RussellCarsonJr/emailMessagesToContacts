@@ -32,7 +32,7 @@ def contacts():
         company_address="Your Company Address",
         recipient_name="Valued Customer",
         body="We appreciate your continued support.",
-        sender_name="You Name",
+        sender_name="Your Name",
         unsubscribe_link="https://RussellCarsonJr.pythonanywhere.com/unsubscribe",
         questions=[
             "How satisfied are you with our service?",
