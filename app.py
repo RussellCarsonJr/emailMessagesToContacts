@@ -17,7 +17,10 @@ load_dotenv()
 app = Flask(__name__)
 
 FILENAME = os.environ.get("DB_FILENAME") or "automate_email_message_contacts.db"
-
+VAR_COMPANY_NAME = os.environ.get("COMPANY_NAME")
+VAR_COMPANY_ADDRESS = os.environ.get("COMPANY_ADDRESS")
+VAR_SENDER_NAME = os.environ.get("SENDER_NAME")
+VAR_SUBJECT = os.environ.get("DEFAULT_SUBJECT")
 
 @app.route("/contacts")
 def contacts():
@@ -27,12 +30,12 @@ def contacts():
     # for i in range(len(mailing_list)):
     return render_template(
         "automate_email_message_template.html",
-        subject="Your Subject",
-        company_name="Your Company Name",
+        subject=VAR_SUBJECT,
+        company_name=VAR_COMPANY_NAME,
         company_address="Your Company Address",
         recipient_name="Valued Customer",
         body="We appreciate your continued support.",
-        sender_name="You Name",
+        sender_name=VAR_SENDER_NAME,
         unsubscribe_link="https://RussellCarsonJr.pythonanywhere.com/unsubscribe",
         questions=[
             "How satisfied are you with our service?",
@@ -70,11 +73,11 @@ def submit_answers():
 
     return render_template(
         "submit_answers_template.html",
-        company_name="Your Company Name",
-        company_address="Your Company Address",
+        company_name=VAR_COMPANY_NAME,
+        company_address=VAR_COMPANY_ADDRESS,
         recipient_name=name,
         body="Thank you for your feedback!",
-        sender_name="Your Name",
+        sender_name=VAR_SENDER_NAME,
         answer_1=answer1,
         answer_2=answer2,
         answer_3=answer3,
@@ -98,11 +101,11 @@ def unsubscribe():
     return render_template(
         "unsubscribe_email_message_template.html",
         subject="Unsubscribe",
-        company_name="Your Company Name",
-        company_address="Your Company Address",
+        company_name=VAR_COMPANY_NAME,
+        company_address=VAR_COMPANY_ADDRESS,
         recipient_name=name,
         body=body,
-        sender_name="Your Name",
+        sender_name=VAR_SENDER_NAME,
         unsubscribe_link="https://RussellCarsonJr.pythonanywhere.com/unsubscribe",
         unsubscribe_page=True,
     )

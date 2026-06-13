@@ -42,6 +42,10 @@ from jinja2 import Environment, FileSystemLoader
 from openpyxl.styles import Font, PatternFill
 
 load_dotenv()
+VAR_COMPANY_NAME = os.environ.get("COMPANY_NAME")
+VAR_COMPANY_ADDRESS = os.environ.get("COMPANY_ADDRESS")
+VAR_SENDER_NAME = os.environ.get("SENDER_NAME")
+VAR_SUBJECT = os.environ.get("DEFAULT_SUBJECT")
 
 # -- Constants ------------------------------------------
 HEADER = ["Name", "Phone", "Email Address"]
@@ -404,11 +408,11 @@ class EmailMessages(Messages):
         """sends the actual email message"""
         html_body = render_template(
             "email_messages_template.html",
-            subject="Your Learning Dreams Visit Confirmation",
-            company_name="Learning Dreams",
-            company_address="1710 W. Genesee St, Flint MI 48504",
+            subject=VAR_SUBJECT,
+            company_name=VAR_COMPANY_NAME,
+            company_address=VAR_COMPANY_ADDRESS,
             recipient_name=self.name,
-            sender_name="Customer Service",
+            sender_name=VAR_SENDER_NAME,
             body="Thank you for your visit. Here is your summary:",
             items=["Test 1 — Evaluation"],  # "Item 2 — Gadget", "Item 3 — Doohickey"],
             unsubscribe_link="https://RussellCarsonJr.pythonanywhere.com/unsubscribe",
@@ -484,11 +488,11 @@ class AutomateEmailMessage(Messages):
         """sends the actual email"""
         html_body = render_template(
             "automate_email_message_template4.html",
-            subject="Your Learning Dreams Visit Confirmation",
-            company_name="Learning Dreams",
-            company_address="1091 Creekwood Trail, Burton, MI 48509",
+            subject=VAR_SUBJECT,
+            company_name=VAR_COMPANY_NAME,
+            company_address=VAR_COMPANY_ADDRESS,
             recipient_name=self.name,
-            sender_name="Customer Service",
+            sender_name=VAR_SENDER_NAME,
             body="Thank you for your visit. Here is your summary:",
             items=["Test 1 — Evaluation"],  # "Item 2 — Gadget", "Item 3 — Doohickey"],
             questions=self.questions,
@@ -578,8 +582,9 @@ if __name__ == "__main__":
     attachments = [os.environ.get("ATTACHMENT_PATH") or ""]
     FILENAME = os.environ.get("DB_FILENAME") or "contacts.db"
     conn, cursor = open_or_create_email_database(FILENAME)
-    add_contacts(conn, cursor, "Your Name", "+1234567890", "your@email.com", "MM/DD/YYYY")
-    add_contacts(conn, cursor, "Your Name", "+1234567890", "your@email.com", "MM/DD/YYYY")
+    add_contacts(conn, cursor, "John Doe", "+11234567890", "john.doe@email.com", "MM/DD/YYYY")
+    add_contacts(conn, cursor, "Jane Doe", "+10987654321", "jane.doe@email.com", "MM/DD/YYYY")
+    view_all_contacts(cursor)
     mailing_list = contacts_mailinglist(cursor)
 
     if not mailing_list:
@@ -588,11 +593,11 @@ if __name__ == "__main__":
         for i in range(len(mailing_list)):
             html_body = render_template(
                 "automate_email_message_template4.html",
-                subject="Your Subject",
-                company_name="Your Company Name",
-                company_address="Your Company Address",
+                subject=VAR_SUBJECT,
+                company_name=VAR_COMPANY_NAME,
+                company_address=VAR_COMPANY_ADDRESS,
                 recipient_name=mailing_list[i]["name"],
-                sender_name="Your Name",
+                sender_name=VAR_SENDER_NAME,
                 body="We appreciate your continued support. Please click the link below to submit your feedback: https://RussellCarsonJr.pythonanywhere.com/contacts",
                 questions=[
                     "How satisfied are you with our service?",
@@ -608,11 +613,11 @@ if __name__ == "__main__":
                 name=mailing_list[i]["name"],
                 phone=mailing_list[i]["phone"],
                 sender_email=os.environ.get("SENDER_EMAIL") or "",
-                sender_name="Your Name",
+                sender_name=VAR_SENDER_NAME,
                 password=os.environ.get("EMAIL_PASSWORD") or "",
-                receiver=mailing_list[i]["email_address"],
+                email_address=mailing_list[i]["email_address"],
                 email_body=html_body,
-                email_subject="Your Subject",
+                email_subject=VAR_SUBJECT,
                 is_html=True,
                 attachments=attachments,
             )

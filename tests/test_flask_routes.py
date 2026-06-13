@@ -37,7 +37,7 @@ def test_contacts_page_loads(client):
 
 def test_contacts_page_contains_company_name(client):
     response = client.get("/contacts")
-    assert b"Your Company Name" in response.data
+    assert b"Learning Dreams" in response.data
 
 
 def test_contacts_page_contains_questions(client):
