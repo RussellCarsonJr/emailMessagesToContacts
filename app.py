@@ -17,10 +17,17 @@ load_dotenv()
 app = Flask(__name__)
 
 FILENAME = os.environ.get("DB_FILENAME") or "automate_email_message_contacts.db"
+<<<<<<< HEAD
 VAR_COMPANY_NAME = os.environ.get("COMPANY_NAME")
 VAR_COMPANY_ADDRESS = os.environ.get("COMPANY_ADDRESS")
 VAR_SENDER_NAME = os.environ.get("SENDER_NAME")
 VAR_SUBJECT = os.environ.get("DEFAULT_SUBJECT")
+=======
+VAR_COMPANY_NAME = os.environ.get("COMPANY_NAME", "Your Company Name")
+VAR_COMPANY_ADDRESS = os.environ.get("COMPANY_ADDRESS", "Your Company Address")
+VAR_SENDER_NAME = os.environ.get("SENDER_NAME", "Your Name")
+VAR_SUBJECT = os.environ.get("DEFAULT_SUBJECT", "Your Subject")
+>>>>>>> 8284f4ddaad42239baf7103fd9ff2a845d2c8abe
 
 @app.route("/contacts")
 def contacts():
@@ -32,7 +39,11 @@ def contacts():
         "automate_email_message_template.html",
         subject=VAR_SUBJECT,
         company_name=VAR_COMPANY_NAME,
+<<<<<<< HEAD
         company_address="Your Company Address",
+=======
+        company_address=VAR_COMPANY_ADDRESS,
+>>>>>>> 8284f4ddaad42239baf7103fd9ff2a845d2c8abe
         recipient_name="Valued Customer",
         body="We appreciate your continued support.",
         sender_name=VAR_SENDER_NAME,

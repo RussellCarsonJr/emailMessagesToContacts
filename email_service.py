@@ -408,11 +408,19 @@ class EmailMessages(Messages):
         """sends the actual email message"""
         html_body = render_template(
             "email_messages_template.html",
+<<<<<<< HEAD
             subject=VAR_SUBJECT,
             company_name=VAR_COMPANY_NAME,
             company_address=VAR_COMPANY_ADDRESS,
             recipient_name=self.name,
             sender_name=VAR_SENDER_NAME,
+=======
+            subject="Your Subject",
+            company_name="Your Company Name",
+            company_address="Your Company Address",
+            recipient_name=self.name,
+            sender_name="Your Name",
+>>>>>>> 8284f4ddaad42239baf7103fd9ff2a845d2c8abe
             body="Thank you for your visit. Here is your summary:",
             items=["Test 1 — Evaluation"],  # "Item 2 — Gadget", "Item 3 — Doohickey"],
             unsubscribe_link="https://RussellCarsonJr.pythonanywhere.com/unsubscribe",
@@ -488,11 +496,19 @@ class AutomateEmailMessage(Messages):
         """sends the actual email"""
         html_body = render_template(
             "automate_email_message_template4.html",
+<<<<<<< HEAD
             subject=VAR_SUBJECT,
             company_name=VAR_COMPANY_NAME,
             company_address=VAR_COMPANY_ADDRESS,
             recipient_name=self.name,
             sender_name=VAR_SENDER_NAME,
+=======
+            subject="Your Subject",
+            company_name="Your Company Name",
+            company_address="Your Company Address",
+            recipient_name=self.name,
+            sender_name="Your Name",
+>>>>>>> 8284f4ddaad42239baf7103fd9ff2a845d2c8abe
             body="Thank you for your visit. Here is your summary:",
             items=["Test 1 — Evaluation"],  # "Item 2 — Gadget", "Item 3 — Doohickey"],
             questions=self.questions,
