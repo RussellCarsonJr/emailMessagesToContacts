@@ -404,11 +404,11 @@ class EmailMessages(Messages):
         """sends the actual email message"""
         html_body = render_template(
             "email_messages_template.html",
-            subject="Your Learning Dreams Visit Confirmation",
-            company_name="Learning Dreams",
-            company_address="1710 W. Genesee St, Flint MI 48504",
+            subject="Your Subject",
+            company_name="Your Company Name",
+            company_address="Your Company Address",
             recipient_name=self.name,
-            sender_name="Customer Service",
+            sender_name="Your Name",
             body="Thank you for your visit. Here is your summary:",
             items=["Test 1 — Evaluation"],  # "Item 2 — Gadget", "Item 3 — Doohickey"],
             unsubscribe_link="https://RussellCarsonJr.pythonanywhere.com/unsubscribe",
@@ -484,11 +484,11 @@ class AutomateEmailMessage(Messages):
         """sends the actual email"""
         html_body = render_template(
             "automate_email_message_template4.html",
-            subject="Your Learning Dreams Visit Confirmation",
-            company_name="Learning Dreams",
-            company_address="1091 Creekwood Trail, Burton, MI 48509",
+            subject="Your Subject",
+            company_name="Your Company Name",
+            company_address="Your Company Address",
             recipient_name=self.name,
-            sender_name="Customer Service",
+            sender_name="Your Name",
             body="Thank you for your visit. Here is your summary:",
             items=["Test 1 — Evaluation"],  # "Item 2 — Gadget", "Item 3 — Doohickey"],
             questions=self.questions,
