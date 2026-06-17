@@ -1,0 +1,33 @@
+# Virtual environment
+.venv/
+venv/
+
+# Database files
+*.db
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Coverage reports
+.coverage
+htmlcov/
+
+# Environment variables
+.env
+
+# Mac files
+.DS_Store
+
+# mypy cache
+.mypy_cache/
+
+# pytest cache
+.pytest_cache/
+
+# VS Code settings
+.vscode/
+
+# Misplaced files
+messages_template.py
